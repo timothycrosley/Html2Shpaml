@@ -10,7 +10,7 @@ Installation:
 
     or
 
-    easy install Html2Shpaml
+    easy_install Html2Shpaml
 
 
 Usage:
