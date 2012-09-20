@@ -1,0 +1,80 @@
+#! /usr/bin/python
+
+import sys
+import codecs
+from WebElements import Base
+from WebElements.Parser import WebElementTree
+from WebElements.StringUtils import interpretAsString
+
+Base.INDENTATION = "  "
+
+class ShpamlTree(WebElementTree):
+    def endTag(self):
+        return ""
+
+    def startTag(self):
+        if not self.tagName:
+            return u''
+
+        self.attributes['name'] = self.fullName()
+        self.attributes['style'] = self.style
+
+        startTag = self.tagName
+        ID = self.fullId()
+        if ID:
+            startTag += "#" + ID
+        for cssClass in self.classes:
+            startTag += "." + cssClass
+        startTag += " "
+
+        for key, value in self.attributes.iteritems():
+            value = interpretAsString(value)
+            if value:
+                if value == '<BLANK>':
+                    value = ""
+
+                if value == '<EMPTY>':
+                    startTag += key + " "
+                else:
+                    if not " " in value and not '"' in value:
+                        startTag += key + '=' + value + ' '
+                    else:
+                        startTag += key + '="' + value.replace('"', '&quot;') + '" '
+
+        if self.tagSelfCloses:
+            startTag = '> ' + startTag
+        elif not self.childElements:
+            startTag = startTag[:-1] + "\n%(indent)s::comment\n%(indent)s%(indent)sempty " % {"indent":Base.INDENTATION}
+        elif len(self.childElements) == 1 and type(self.childElements[0]) == Base.TextNode:
+            textNode = self.childElements[0]
+            if not "\n" in textNode.text():
+                startTag += "| " + textNode.text() + " "
+                self.removeChild(textNode)
+
+        return startTag[:-1]
+
+def parseFile(fileName, saveChanges=True):
+    with open(fileName, 'r') as fileObj:
+        text = fileObj.read().decode('utf8')
+        tree = ShpamlTree(text)
+
+        print tree.toHtml(formatted=True)
+
+    return tree
+
+def printDoc():
+    print "Html2Shpaml 0.1 is a forgiving html to shpaml converter"
+    print "usage: Html2Shpaml (filename)"
+    print ""
+    print "Directly prints Shpaml syntaxt - with can then be redirected into a file"
+
+def main(argv):
+    if len(argv) < 2:
+        printDoc()
+    elif len(argv) == 2:
+        parseFile(argv[1])
+    else:
+        printDoc()
+
+if __name__ == '__main__':
+    main(sys.argv)
