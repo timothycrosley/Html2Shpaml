@@ -8,7 +8,7 @@ setup(name='Html2Shpaml',
       author='Timothy Crosley',
       author_email='timothy.crosley@gmail.com',
       url='http://www.simpleinnovation.org/',
-      download_url='https://github.com/timothycrosley/CleanHTML/blob/master/dist/Html2Shpaml-0.1.tar.gz?raw=true',
+      download_url='https://github.com/timothycrosley/Html2Shpaml/blob/master/dist/Html2Shpaml-0.1.tar.gz?raw=true',
       license = "GNU GPLv2",
       scripts=['scripts/html2Shpaml',],
       requires = ['webelements',],)
