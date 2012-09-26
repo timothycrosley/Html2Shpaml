@@ -13,13 +13,13 @@ class ShpamlTree(WebElementTree):
         return ""
 
     def startTag(self):
-        if not self.tagName:
+        if not self._tagName:
             return u''
 
         self.attributes['name'] = self.fullName()
         self.attributes['style'] = self.style
 
-        startTag = self.tagName
+        startTag = self._tagName
         ID = self.fullId()
         if ID:
             startTag += "#" + ID
@@ -41,7 +41,7 @@ class ShpamlTree(WebElementTree):
                     else:
                         startTag += key + '="' + value.replace('"', '&quot;') + '" '
 
-        if self.tagSelfCloses:
+        if self._tagSelfCloses:
             startTag = '> ' + startTag
         elif not self.childElements:
             startTag = startTag[:-1] + "\n%(indent)s::comment\n%(indent)s%(indent)sempty " % {"indent":Base.INDENTATION}
@@ -54,6 +54,10 @@ class ShpamlTree(WebElementTree):
         return startTag[:-1]
 
 def parseFile(fileName, saveChanges=True):
+    """
+        Parses an html file and prints its content converted to shpmal to standard out - returning a
+        webelement tree representation
+    """
     with open(fileName, 'r') as fileObj:
         text = fileObj.read().decode('utf8')
         tree = ShpamlTree(text)
@@ -62,19 +66,25 @@ def parseFile(fileName, saveChanges=True):
 
     return tree
 
+def convert(text):
+    """
+        Takes raw html text and converts it to shpaml
+    """
+    return ShpamlTree(text).toHtml(formatted=True)
+
 def printDoc():
+    """
+        Prints documentation on how to use shpaml from the command line
+    """
     print "Html2Shpaml 0.1 is a forgiving html to shpaml converter"
     print "usage: Html2Shpaml (filename)"
     print ""
     print "Directly prints Shpaml syntaxt - with can then be redirected into a file"
 
-def main(argv):
-    if len(argv) < 2:
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
         printDoc()
-    elif len(argv) == 2:
-        parseFile(argv[1])
+    elif len(sys.argv) == 2:
+        parseFile(sys.argv[1])
     else:
         printDoc()
-
-if __name__ == '__main__':
-    main(sys.argv)
