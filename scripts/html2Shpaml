@@ -1,20 +1,51 @@
 #! /usr/bin/python
+'''
+    html2Shpaml.py
+
+    Contains elements that utilize the google charts public api to produce charts based on common data
+
+    Copyright (C) 2013  Timothy Edmund Crosley
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+'''
 
 import sys
 import codecs
 from WebElements import Base
 from WebElements.Parser import WebElementTree
+from WebElements.MultiplePythonSupport import *
 from WebElements.StringUtils import interpretAsString
 
 Base.INDENTATION = "  "
 
 class ShpamlTree(WebElementTree):
+    """
+        Defines how the tree will be formed when SHPAML is passed in
+    """
     def endTag(self):
+        """
+            Overrides end tag to return None as shpaml syntax does not include end tags
+        """
         return ""
 
     def startTag(self):
+        """
+            Overrides startTag to render using shpaml condensed syntax
+        """
         if not self._tagName:
-            return u''
+            return u('')
 
         self.attributes['name'] = self.fullName()
         self.attributes['style'] = self.style
@@ -27,7 +58,7 @@ class ShpamlTree(WebElementTree):
             startTag += "." + cssClass
         startTag += " "
 
-        for key, value in self.attributes.iteritems():
+        for key, value in iteritems(self.attributes):
             value = interpretAsString(value)
             if value:
                 if value == '<BLANK>':
@@ -53,6 +84,7 @@ class ShpamlTree(WebElementTree):
 
         return startTag[:-1]
 
+
 def parseFile(fileName, saveChanges=True):
     """
         Parses an html file and prints its content converted to shpmal to standard out - returning a
@@ -62,7 +94,7 @@ def parseFile(fileName, saveChanges=True):
         text = fileObj.read().decode('utf8')
         tree = ShpamlTree(text)
 
-        print tree.toHtml(formatted=True)
+        print(tree.toHTML(formatted=True))
 
     return tree
 
@@ -70,16 +102,16 @@ def convert(text):
     """
         Takes raw html text and converts it to shpaml
     """
-    return ShpamlTree(text).toHtml(formatted=True)
+    return ShpamlTree(text).toHTML(formatted=True)
 
 def printDoc():
     """
         Prints documentation on how to use shpaml from the command line
     """
-    print "Html2Shpaml 0.1 is a forgiving html to shpaml converter"
-    print "usage: Html2Shpaml (filename)"
-    print ""
-    print "Directly prints Shpaml syntaxt - with can then be redirected into a file"
+    print("Html2Shpaml 0.1 is a forgiving html to shpaml converter")
+    print("usage: Html2Shpaml (filename)")
+    print("")
+    print("Directly prints Shpaml syntaxt - with can then be redirected into a file")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
