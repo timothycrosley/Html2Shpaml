@@ -21,19 +21,20 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 '''
 
-import sys
-import codecs
 from WebElements import Base
+from WebElements.Base import Settings
 from WebElements.Parser import WebElementTree
 from WebElements.MultiplePythonSupport import *
-from WebElements.StringUtils import interpretAsString
 
-Base.INDENTATION = "  "
+
+Settings.INDENTATION = "    "
+
 
 class ShpamlTree(WebElementTree):
     """
         Defines how the tree will be formed when SHPAML is passed in
     """
+
     def endTag(self):
         """
             Overrides end tag to return None as shpaml syntax does not include end tags
@@ -59,7 +60,7 @@ class ShpamlTree(WebElementTree):
         startTag += " "
 
         for key, value in iteritems(self.attributes):
-            value = interpretAsString(value)
+            value = str(value)
             if value:
                 if value == '<BLANK>':
                     value = ""
@@ -75,7 +76,8 @@ class ShpamlTree(WebElementTree):
         if self._tagSelfCloses:
             startTag = '> ' + startTag
         elif not self.childElements:
-            startTag = startTag[:-1] + "\n%(indent)s::comment\n%(indent)s%(indent)sempty " % {"indent":Base.INDENTATION}
+            startTag = startTag[:-1] + "\n%(indent)s::comment\n%(indent)s%(indent)sempty " % {
+                "indent": Settings.INDENTATION}
         elif len(self.childElements) == 1 and type(self.childElements[0]) == Base.TextNode:
             textNode = self.childElements[0]
             if not "\n" in textNode.text():
@@ -98,11 +100,13 @@ def parseFile(fileName, saveChanges=True):
 
     return tree
 
+
 def convert(text):
     """
         Takes raw html text and converts it to shpaml
     """
     return ShpamlTree(text).toHTML(formatted=True)
+
 
 def printDoc():
     """
@@ -112,6 +116,7 @@ def printDoc():
     print("usage: Html2Shpaml (filename)")
     print("")
     print("Directly prints Shpaml syntaxt - with can then be redirected into a file")
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
